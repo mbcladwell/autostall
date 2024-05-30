@@ -1,0 +1,16 @@
+2021-11-04 09:51:32.254 GMT [9197] LOG:  starting PostgreSQL 13.3 on x86_64-unknown-linux-gnu, compiled by gcc (GCC) 7.5.0, 64-bit
+2021-11-04 09:51:32.255 GMT [9197] LOG:  could not bind IPv6 address "::1": Address already in use
+2021-11-04 09:51:32.255 GMT [9197] HINT:  Is another postmaster already running on port 5432? If not, wait a few seconds and retry.
+2021-11-04 09:51:32.255 GMT [9197] LOG:  could not bind IPv4 address "127.0.0.1": Address already in use
+2021-11-04 09:51:32.255 GMT [9197] HINT:  Is another postmaster already running on port 5432? If not, wait a few seconds and retry.
+2021-11-04 09:51:32.255 GMT [9197] WARNING:  could not create listen socket for "localhost"
+2021-11-04 09:51:32.255 GMT [9197] FATAL:  could not create any TCP/IP sockets
+2021-11-04 09:51:32.256 GMT [9197] LOG:  database system is shut down
+2021-11-04 11:06:01.380 GMT [11842] LOG:  starting PostgreSQL 13.3 on x86_64-unknown-linux-gnu, compiled by gcc (GCC) 7.5.0, 64-bit
+2021-11-04 11:06:01.380 GMT [11842] LOG:  could not bind IPv6 address "::1": Address already in use
+2021-11-04 11:06:01.380 GMT [11842] HINT:  Is another postmaster already running on port 5432? If not, wait a few seconds and retry.
+2021-11-04 11:06:01.380 GMT [11842] LOG:  could not bind IPv4 address "127.0.0.1": Address already in use
+2021-11-04 11:06:01.380 GMT [11842] HINT:  Is another postmaster already running on port 5432? If not, wait a few seconds and retry.
+2021-11-04 11:06:01.381 GMT [11842] WARNING:  could not create listen socket for "localhost"
+2021-11-04 11:06:01.381 GMT [11842] FATAL:  could not create any TCP/IP sockets
+2021-11-04 11:06:01.382 GMT [11842] LOG:  database system is shut down

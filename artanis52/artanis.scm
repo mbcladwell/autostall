@@ -1,0 +1,4 @@
+
+(define-module (artanis)
+  #:use-module (artanis artanis))
+(define a #f)

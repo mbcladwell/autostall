@@ -1,0 +1,6 @@
+#! /usr/bin/bash
+!#
+
+guix package --install-from-file=limsn.scm
+guix package --list-installed | grep limsn | cut -f 4
+/gnu/store/x3azrddspwa8xmrmxddm4k9aigaps5i3-limsn-0.1.0/share/guile/site/3.0/limsn/bin/start-limsn.sh 
