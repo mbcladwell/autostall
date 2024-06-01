@@ -1,0 +1,10 @@
+see: https://www.stihie.net/labsolns/artforguix/
+
+The follow files are modified:
+
+commands/work.scm
+tpl/parser.scm
+mvc/controller.scm
+webapi/restful.scm
+
+utils.scm
