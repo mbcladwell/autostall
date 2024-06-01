@@ -6,7 +6,7 @@ git commit -a -S -m "autocommit"
 git push
      
 COMMITID=$(git log -1 --pretty=format:"%H")
-cd /home/mbc/syncd/tobedeleted/artanis7
+cd /home/mbc/projects/autostall/artanis7
 
 sed -i "s/[ ]*(let ((commit \"[a-z0-9]*\")/             (let ((commit \"$COMMITID\")/" ./guix.scm
 

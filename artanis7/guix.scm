@@ -15,6 +15,8 @@
   #:use-module (gnu packages texinfo)
   #:use-module (labsolns guile-oauth)
   #:use-module (json)
+  #:use-module (gnu packages curl)
+  
   #:use-module (gnu packages linux)
   ;; #:use-module (dbi dbi)
    #:use-module (ice-9 readline)
@@ -100,40 +102,40 @@
   )
 
 (define-public artanis-07
-             (let ((commit "43fd2a95bf06019c16c5f72434285082a44c9b86")
+             (let ((commit "af727f6a1bc8434d6d12bf9027cd1e78f14a7868")
         (revision "4"))
   (package
     (name "artanis")
-    (version (string-append "0.6." (string-take commit 7)))
+    (version (string-append "0.7." (string-take commit 7)))
     (source (origin
 	     (method git-fetch)
              (uri (git-reference
-                   (url "https://gitlab.com/mbcladwell/artanis")
+                   (url "https://github.com/mbcladwell/artanis")
                    (commit commit)))
              (file-name (git-file-name name version))
               (sha256
-               (base32 "0qf73lj811spfdz0zc18l0vvhwdsrgpgk1xsq9d3k7b76i5j4ky0"))
+               (base32 "1a044gzzxq0a2746m6dcskpzz6g0nkpx155vrjzfpzz6ziqi2zzw"))
               (modules '((guix build utils)))
 
 
-	      (snippet
-               '(begin
-                  ;; Unbundle guile-redis and guile-json
-                  (delete-file-recursively "artanis/third-party/json.scm")
-                  (delete-file-recursively "artanis/third-party/json")
-                  (delete-file-recursively "artanis/third-party/redis.scm")
-                  (delete-file-recursively "artanis/third-party/redis")
-                  (substitute* '("artanis/artanis.scm"
-                                 "artanis/lpc.scm"
-                                 "artanis/oht.scm")
-                    (("(#:use-module \\()artanis third-party (json\\))" _
-                      use-module json)
-                     (string-append use-module json)))
-                  (substitute* '("artanis/lpc.scm"
-                                 "artanis/session.scm")
-                    (("(#:use-module \\()artanis third-party (redis\\))" _
-                      use-module redis)
-                     (string-append use-module redis)))))
+	      ;; (snippet
+              ;;  '(begin
+              ;;     ;; Unbundle guile-redis and guile-json
+              ;;     (delete-file-recursively "artanis/third-party/json.scm")
+              ;;     (delete-file-recursively "artanis/third-party/json")
+              ;;     (delete-file-recursively "artanis/third-party/redis.scm")
+              ;;     (delete-file-recursively "artanis/third-party/redis")
+              ;;     (substitute* '("artanis/artanis.scm"
+              ;;                    "artanis/lpc.scm"
+              ;;                    "artanis/oht.scm")
+              ;;       (("(#:use-module \\()artanis third-party (json\\))" _
+              ;;         use-module json)
+              ;;        (string-append use-module json)))
+              ;;     (substitute* '("artanis/lpc.scm"
+              ;;                    "artanis/session.scm")
+              ;;       (("(#:use-module \\()artanis third-party (redis\\))" _
+              ;;         use-module redis)
+              ;;        (string-append use-module redis)))))
 	      
 	      ))
     (build-system guile-build-system)
@@ -149,7 +151,8 @@
     (propagated-inputs
      `(("guile-json" ,guile-json-3) 
        ("guile-readline" ,guile-readline)
-       ("guile-redis" ,guile-redis)))
+       ("guile-redis" ,guile-redis)
+       ("guile-curl" ,guile-curl)))
     (native-inputs
      `(("bash"       ,bash)         ;for the `source' builtin
        ("pkgconfig"  ,pkg-config)
@@ -178,10 +181,25 @@
 			       (assoc-ref inputs "nss") "/lib/nss/libssl3.so"  ;; /lib/nss in original
                  "\"")))
              #t))
+	 (add-after 'unpack 'augment-GUILE_LOAD_PATH
+		    (lambda* (#:key inputs outputs #:allow-other-keys)
+		      (let* ((out  (assoc-ref outputs "out"))
+			     (scm  "/share/guile/site/3.0"))
+			(setenv "GUILE_LOAD_PATH"
+				(string-append
+				 ;; "./limsn/lib:"  ;;needed for libraries
+				 (string-append out scm ":")
+				;; (assoc-ref inputs "artanis") "/share/guile/site/3.0:"
+				 (assoc-ref inputs "guile-json") "/share/guile/site/3.0:"
+				 (assoc-ref inputs "guile-redis") "/share/guile/site/3.0:"
+				 (assoc-ref inputs "guile-curl") "/share/guile/site/3.0:"					       
+				 (getenv "GUILE_LOAD_PATH")))
+			#t)))
+
 	 (add-after 'patch-reference-to-libnss 'patch-prefix
 	   (lambda* (#:key inputs outputs #:allow-other-keys)
 	     (let ((out  (assoc-ref outputs "out")))					  
-	       (substitute* '("./bin/art")
+	       (substitute* '("./bin/art.in")
 		 (("guileexecutable")
 		  (string-append (assoc-ref inputs "guile") "/bin/guile"))) )
 				    #t))		    	 
