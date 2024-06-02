@@ -47,3 +47,14 @@ and replace with:
   
   (define (current-toplevel)
     (string-append \"/tmp/\" (and=> (string-match \".+/(.+)$\" (getcwd)) (lambda (m) (match:substring m 1)))))
+
+
+---------must manually create artanis/version.scm
+
+(define-module (artanis version)
+  #:export (artanis-version))
+(define artanis-version "GNU Artanis-0.7")
+
+-------modify artanis/bin/art.in
+
+substitute* to modify the guile executable

@@ -102,7 +102,7 @@
   )
 
 (define-public artanis-07
-             (let ((commit "af727f6a1bc8434d6d12bf9027cd1e78f14a7868")
+             (let ((commit "8fd70920259d207d2591c2f0f347f0efabdc67fa")
         (revision "4"))
   (package
     (name "artanis")
@@ -114,29 +114,9 @@
                    (commit commit)))
              (file-name (git-file-name name version))
               (sha256
-               (base32 "1a044gzzxq0a2746m6dcskpzz6g0nkpx155vrjzfpzz6ziqi2zzw"))
+               (base32 "16b9fxbx8dwm941zxsw3ddx8i87ds7ssajhcfr04ymkibfaifw7g"))
               (modules '((guix build utils)))
 
-
-	      ;; (snippet
-              ;;  '(begin
-              ;;     ;; Unbundle guile-redis and guile-json
-              ;;     (delete-file-recursively "artanis/third-party/json.scm")
-              ;;     (delete-file-recursively "artanis/third-party/json")
-              ;;     (delete-file-recursively "artanis/third-party/redis.scm")
-              ;;     (delete-file-recursively "artanis/third-party/redis")
-              ;;     (substitute* '("artanis/artanis.scm"
-              ;;                    "artanis/lpc.scm"
-              ;;                    "artanis/oht.scm")
-              ;;       (("(#:use-module \\()artanis third-party (json\\))" _
-              ;;         use-module json)
-              ;;        (string-append use-module json)))
-              ;;     (substitute* '("artanis/lpc.scm"
-              ;;                    "artanis/session.scm")
-              ;;       (("(#:use-module \\()artanis third-party (redis\\))" _
-              ;;         use-module redis)
-              ;;        (string-append use-module redis)))))
-	      
 	      ))
     (build-system guile-build-system)
     (inputs
@@ -195,8 +175,11 @@
 				 (assoc-ref inputs "guile-curl") "/share/guile/site/3.0:"					       
 				 (getenv "GUILE_LOAD_PATH")))
 			#t)))
+	 ;; (substitute* '("artanis/bin/art.in")
+	 ;; 	      (("guileexecutable")
+	 ;; 	       (string-append (assoc-ref inputs "guile") "/bin/guile")))
 
-	 (add-after 'patch-reference-to-libnss 'patch-prefix
+	 (add-after 'unpack 'modify_executable
 	   (lambda* (#:key inputs outputs #:allow-other-keys)
 	     (let ((out  (assoc-ref outputs "out")))					  
 	       (substitute* '("./bin/art.in")
@@ -218,7 +201,7 @@
                     (bin (string-append out "/bin"))
                     (scm (string-append out "/share/guile/site/3.0"))
                     (go  (string-append out "/lib/guile/3.0/site-ccache")))
-               (wrap-program (string-append bin "/art")
+               (wrap-program (string-append bin "/art.in")
                  `("GUILE_LOAD_PATH" ":" prefix
                    (,scm ,(getenv "GUILE_LOAD_PATH")))
                  `("GUILE_LOAD_COMPILED_PATH" ":" prefix
