@@ -6,8 +6,6 @@
   #:use-module (guix build-system gnu)
   #:use-module (guix utils)
   #:use-module (gnu packages autotools)
-  #:use-module (gnu packages)
-  #:use-module (gnu packages bash)
   #:use-module (gnu packages guile)
   #:use-module (guix build-system guile)
   #:use-module (gnu packages guile-xyz)
@@ -18,11 +16,9 @@
   #:use-module (gnu packages curl)
   
   #:use-module (gnu packages linux)
-  ;; #:use-module (dbi dbi)
    #:use-module (ice-9 readline)
    #:use-module (gnu packages nss) ;;;;;;;;;;
    
-   #:use-module (gnu packages guile-xyz)
   #:use-module (gnu packages)
   #:use-module (gnu packages autotools)
   #:use-module (gnu packages avahi)
@@ -30,27 +26,19 @@
   #:use-module (gnu packages bash)
   #:use-module (gnu packages compression)
   #:use-module (gnu packages crypto)
-  #:use-module (gnu packages databases)
   #:use-module (gnu packages disk)
   #:use-module (gnu packages gettext)
   #:use-module (gnu packages gl)
   #:use-module (gnu packages glib)
   #:use-module (gnu packages gnome)
   #:use-module (gnu packages gnupg)
-  #:use-module (gnu packages gperf)
-  #:use-module (gnu packages gstreamer)
   #:use-module (gnu packages gtk)
   #:use-module (gnu packages guile)
   #:use-module (gnu packages hurd)
-  #:use-module (gnu packages image)
-  #:use-module (gnu packages imagemagick)
   #:use-module (gnu packages libffi)
   #:use-module (gnu packages libunistring)
   #:use-module (gnu packages man)
-  #:use-module (gnu packages maths)
   #:use-module (gnu packages mes)
-  #:use-module (gnu packages multiprecision)
-  #:use-module (gnu packages ncurses)
   #:use-module (gnu packages networking)
   #:use-module (gnu packages noweb)
    #:use-module (gnu packages package-management)
@@ -80,19 +68,10 @@
   #:use-module (guix build utils)
   #:use-module (guix gexp)
   #:use-module (ice-9 match)
-  #:use-module (guix build-system cmake)
-  #:use-module (guix build-system glib-or-gtk)
   #:use-module (guix build-system guile)
-  #:use-module (gnu packages algebra)
-  #:use-module (gnu packages aspell)
-  #:use-module (gnu packages emacs)
-  #:use-module (gnu packages emacs-xyz)
-  #:use-module (gnu packages gawk)
-  #:use-module (gnu packages sdl)
   #:use-module (gnu packages search)
   #:use-module (gnu packages serialization)
   #:use-module (gnu packages slang)
-  #:use-module (gnu packages sqlite)
   #:use-module (gnu packages swig)
   #:use-module (gnu packages webkit)
   #:use-module (gnu packages xdisorg)
@@ -120,23 +99,18 @@
 	      ))
     (build-system guile-build-system)
     (inputs
-     `(("guile" ,guile-3.0)
-       ("nss" ,nss)
-       ("nspr" ,nspr)
-       ))
+     (list guile-3.0 nspr nss))
     ;; FIXME the bundled csv contains one more exported procedure
     ;; (sxml->csv-string) than guile-csv. The author is maintainer of both
     ;; projects.
     ;; TODO: Add guile-dbi and guile-dbd optional dependencies.
-    (propagated-inputs
-     `(("guile-json" ,guile-json-3) 
-       ("guile-readline" ,guile-readline)
-       ("guile-redis" ,guile-redis)
-       ("guile-curl" ,guile-curl)))
+      (propagated-inputs
+     (list guile-json-4 guile-curl guile-readline guile-redis))
     (native-inputs
-     `(("bash"       ,bash)         ;for the `source' builtin
-       ("pkgconfig"  ,pkg-config)
-       ("util-linux" ,util-linux))) ;for the `script' command
+     (list bash-minimal                           ;for the `source' builtin
+           pkg-config
+           util-linux))                           ;for the `script' command
+  
     (arguments
      '(
        #:phases
@@ -161,24 +135,6 @@
 			       (assoc-ref inputs "nss") "/lib/nss/libssl3.so"  ;; /lib/nss in original
                  "\"")))
              #t))
-	 (add-after 'unpack 'augment-GUILE_LOAD_PATH
-		    (lambda* (#:key inputs outputs #:allow-other-keys)
-		      (let* ((out  (assoc-ref outputs "out"))
-			     (scm  "/share/guile/site/3.0"))
-			(setenv "GUILE_LOAD_PATH"
-				(string-append
-				 ;; "./limsn/lib:"  ;;needed for libraries
-				 (string-append out scm ":")
-				;; (assoc-ref inputs "artanis") "/share/guile/site/3.0:"
-				 (assoc-ref inputs "guile-json") "/share/guile/site/3.0:"
-				 (assoc-ref inputs "guile-redis") "/share/guile/site/3.0:"
-				 (assoc-ref inputs "guile-curl") "/share/guile/site/3.0:"					       
-				 (getenv "GUILE_LOAD_PATH")))
-			#t)))
-	 ;; (substitute* '("artanis/bin/art.in")
-	 ;; 	      (("guileexecutable")
-	 ;; 	       (string-append (assoc-ref inputs "guile") "/bin/guile")))
-
 	 (add-after 'unpack 'modify_executable
 	   (lambda* (#:key inputs outputs #:allow-other-keys)
 	     (let ((out  (assoc-ref outputs "out")))					  

@@ -46,7 +46,7 @@ and replace with:
   (find-ENTRY-path identity #t)))
   
   (define (current-toplevel)
-    (string-append \"/tmp/\" (and=> (string-match \".+/(.+)$\" (getcwd)) (lambda (m) (match:substring m 1)))))
+  (string-append "/tmp/" (match:substring (string-match ".+/(.+)$" (getcwd)) 1)))
 
 
 ---------must manually create artanis/version.scm
@@ -58,3 +58,23 @@ and replace with:
 -------modify artanis/bin/art.in
 
 substitute* to modify the guile executable
+
+
+-------modify artanis/ENTRY 
+has a current-toplevel for lib  --> immutable top level
+
+
+----to run
+in directory
+
+art.in work --config=./conf/artanis.conf
+
+first must:
+mkdir -p /tmp/babweb/tmp/cache
+mkdir -p /tmp/babweb/prv/session
+
+
+
+---------artanis.conf
+
+upload.path = "/home/mbc/temp/babdata"

@@ -143,7 +143,8 @@
   (or (%immutable-toplevel)
       (find-ENTRY-path identity #t)))
 (define (current-toplevel)
-  (string-append "/tmp/" (match:substring (string-match ".+/(.+)$" (getcwd)) 1)))
+  (string-append "/tmp/" (match:substring (string-match ".+/(.+)$" (getcwd)) 1))
+  )
 
 ;;replacement is above
 
