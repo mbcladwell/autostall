@@ -5,10 +5,13 @@
   #:use-module (guix git-download)
   #:use-module (guix build-system gnu)
   #:use-module (guix utils)
+  #:use-module (gnu packages autotools)
   #:use-module (gnu packages guile)
   #:use-module (guix build-system guile)
   #:use-module (gnu packages guile-xyz)
   #:use-module (gnu packages pkg-config)
+  #:use-module (gnu packages texinfo)
+  #:use-module (labsolns guile-oauth)
   #:use-module (json)
   #:use-module (gnu packages curl)
   
@@ -17,6 +20,8 @@
    #:use-module (gnu packages nss) ;;;;;;;;;;
    
   #:use-module (gnu packages)
+  #:use-module (gnu packages autotools)
+  #:use-module (gnu packages avahi)
   #:use-module (gnu packages base)
   #:use-module (gnu packages bash)
   #:use-module (gnu packages compression)
@@ -25,17 +30,25 @@
   #:use-module (gnu packages gettext)
   #:use-module (gnu packages gl)
   #:use-module (gnu packages glib)
+  #:use-module (gnu packages gnome)
   #:use-module (gnu packages gnupg)
+  #:use-module (gnu packages gtk)
   #:use-module (gnu packages guile)
   #:use-module (gnu packages hurd)
   #:use-module (gnu packages libffi)
   #:use-module (gnu packages libunistring)
+  #:use-module (gnu packages man)
   #:use-module (gnu packages mes)
   #:use-module (gnu packages networking)
   #:use-module (gnu packages noweb)
    #:use-module (gnu packages package-management)
   #:use-module (gnu packages password-utils)
+  #:use-module (gnu packages perl)
+  #:use-module (gnu packages pkg-config)
+  #:use-module (gnu packages python)
   #:use-module (gnu packages readline)
+  #:use-module (gnu packages tex)
+  #:use-module (gnu packages texinfo)
   #:use-module (gnu packages tls)
    #:use-module (gnu packages version-control)
   #:use-module (guix packages)
@@ -49,6 +62,7 @@
   #:use-module (guix store)
   #:use-module (guix git-download)
   #:use-module (guix hg-download)
+  #:use-module (guix build-system gnu)
   #:use-module (guix utils)
   #:autoload   (srfi srfi-98) (get-environment-variables)
   #:use-module (guix build utils)
@@ -60,13 +74,14 @@
   #:use-module (gnu packages slang)
   #:use-module (gnu packages swig)
   #:use-module (gnu packages webkit)
+  #:use-module (gnu packages xdisorg)
   #:use-module (gnu packages xorg)
   #:use-module ((srfi srfi-1) #:select (alist-delete))
 
   )
 
 (define-public artanis-07
-             (let ((commit "69de573cffe92c95892bf997978ad99dc6b42493")
+             (let ((commit "8fd70920259d207d2591c2f0f347f0efabdc67fa")
         (revision "4"))
   (package
     (name "artanis")
@@ -78,7 +93,7 @@
                    (commit commit)))
              (file-name (git-file-name name version))
               (sha256
-               (base32 "15b860kmgabbdha2mjd7dlqn6csklwwbjhhc1qv6mscqfgi334a1"))
+               (base32 "16b9fxbx8dwm941zxsw3ddx8i87ds7ssajhcfr04ymkibfaifw7g"))
               (modules '((guix build utils)))
 
 	      ))
@@ -90,7 +105,7 @@
     ;; projects.
     ;; TODO: Add guile-dbi and guile-dbd optional dependencies.
       (propagated-inputs
-     (list guile-json-4 guile-curl guile-readline))
+     (list guile-json-4 guile-curl guile-readline guile-redis))
     (native-inputs
      (list bash-minimal                           ;for the `source' builtin
            pkg-config
@@ -157,7 +172,7 @@ associated with common activities performed in web development.  Artanis
 provides several tools for web development: database access, templating
 frameworks, session management, URL-remapping for RESTful, page caching, and
 more. v0.6 contains feature enhancements required by LIMS*Nucleus. v0.6 install
-uses Guile Build System; v0.7 is used by build-a-bot")
+uses Guile Build System")
     (home-page "https://www.gnu.org/software/artanis/")
     (license (list license:gpl3+ license:lgpl3+))))) ;dual license
 

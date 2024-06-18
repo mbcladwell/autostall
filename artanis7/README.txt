@@ -78,3 +78,11 @@ mkdir -p /tmp/babweb/prv/session
 ---------artanis.conf
 
 upload.path = "/home/mbc/temp/babdata"
+
+
+-------Redis removal
+
+remove third-party/redis.scm
+session.scm
+lpc.scm
+
