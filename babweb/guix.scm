@@ -1,4 +1,4 @@
-(define-module (labsolns ebbot)
+(define-module (babweb)
   #:use-module (guix packages)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix download)
@@ -19,16 +19,16 @@
 
   )
 
-(define-public ebbot
+(define-public babweb
              (let ((commit "346c53f970787ec9887e1ba00a24d3e5b552e66c")
         (revision "4"))
 (package
-  (name "ebbot")
+  (name "babweb")
   (version (string-append "0.1." (string-take commit 7)))
   (source (origin
            (method git-fetch)
                 (uri (git-reference
-                      (url "https://github.com/mbcladwell/ebbot")
+                      (url "https://github.com/mbcladwell/babweb")
                       (commit commit)))
                         (file-name (git-file-name name version))
                 (sha256 
@@ -45,21 +45,21 @@
     		       (add-after 'unpack 'patch-prefix
 				  (lambda* (#:key inputs outputs #:allow-other-keys)
 				    (let ((out  (assoc-ref outputs "out")))					  
-				      (substitute* '("scripts/ebbot.sh" "scripts/format.sh" "scripts/init-acct.sh" "scripts/masttoot.sh")
-					(("ebbotstorepath")
+				      (substitute* '("scripts/babweb.sh" "scripts/format.sh" "scripts/init-acct.sh" "scripts/masttoot.sh")
+					(("babwebstorepath")
 					 out))
-				      (substitute* '("scripts/ebbot.sh" "scripts/format.sh" "scripts/init-acct.sh" "scripts/masttoot.sh")
+				      (substitute* '("scripts/babweb.sh" "scripts/format.sh" "scripts/init-acct.sh" "scripts/masttoot.sh")
 					(("guileloadpath")
 					 (string-append  out "/share/guile/site/3.0:"
 							 (assoc-ref inputs "guile")  "/share/guile/site/3.0:"
 							 (assoc-ref inputs "guile-json")  "/share/guile/site/3.0:"
 							 (assoc-ref inputs "guile-oauth")  "/share/guile/site/3.0:"
 							 (getenv "GUILE_LOAD_PATH") "\"")))
-				      (substitute* '("scripts/ebbot.sh" "scripts/format.sh" "scripts/init-acct.sh" "scripts/masttoot.sh")
+				      (substitute* '("scripts/babweb.sh" "scripts/format.sh" "scripts/init-acct.sh" "scripts/masttoot.sh")
 					(("guileexecutable")
 					 (string-append (assoc-ref inputs "guile") "/bin/guile")))
 				      
-				      (substitute* '("scripts/ebbot.sh" "scripts/format.sh" "scripts/init-acct.sh" "scripts/masttoot.sh")
+				      (substitute* '("scripts/babweb.sh" "scripts/format.sh" "scripts/init-acct.sh" "scripts/masttoot.sh")
 					(("guileloadcompiledpath")
 					 (string-append  out "/lib/guile/3.0/site-ccache:"
 							 (assoc-ref inputs "guile")  "/lib/guile/3.0/site-ccache:"
@@ -70,9 +70,9 @@
 		       (add-after 'patch-prefix 'make-dir
 			 (lambda* (#:key outputs #:allow-other-keys)
 			   (let* ((out  (assoc-ref outputs "out"))
-				  (ebbot-dir (string-append out "/share/guile/site/3.0/ebbot"))
-				  (mkdir-p ebbot-dir)
-				  (dummy (copy-recursively "./ebbot" ebbot-dir))) 
+				  (babweb-dir (string-append out "/share/guile/site/3.0/babweb"))
+				  (mkdir-p babweb-dir)
+				  (dummy (copy-recursively "./babweb" babweb-dir))) 
 			     #t)))
 		       
 			   (add-after 'make-dir 'make-bin-dir
@@ -81,7 +81,7 @@
 					   (bin-dir (string-append out "/bin"))
 					   (scm  "/share/guile/site/3.0")
 					   (go   "/lib/guile/3.0/site-ccache")
-					   (all-files '("ebbot.sh" "format.sh" "init-acct.sh" "masttoot.sh")))				      
+					   (all-files '("babweb.sh" "format.sh" "init-acct.sh" "masttoot.sh")))				      
 				      (map (lambda (file)
 					     (begin
 					       (install-file (string-append "./scripts/" file) bin-dir)
@@ -107,4 +107,4 @@
   (license license:gpl3+))))
 
 
-
+babweb
