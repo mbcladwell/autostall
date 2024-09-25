@@ -14,13 +14,13 @@
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages texinfo)
   #:use-module (labsolns guile-oauth)
-  #:use-module (labsolns artanis-07)
+;;  #:use-module (labsolns artanis-07)
   #:use-module (json)
 
   )
 
 (define-public babweb
-             (let ((commit "346c53f970787ec9887e1ba00a24d3e5b552e66c")
+             (let ((commit "fd9b947edc17f15ce0662cb9e839aa3e7c88433b")
         (revision "4"))
 (package
   (name "babweb")
@@ -32,7 +32,7 @@
                       (commit commit)))
                         (file-name (git-file-name name version))
                 (sha256 
-             (base32 "126lirsf8k719g7bka6is19hrqvzimmgh771clfh1dbkgjsava8c"))))
+             (base32 "0npn19g6zg26b2qcp6197hvshmz2crp9fm0jilihlyq1j59ipa9j"))))
   (build-system guile-build-system)
   (arguments `(
 	     ;;  #:modules (((guix build guile-build-system)
@@ -45,21 +45,21 @@
     		       (add-after 'unpack 'patch-prefix
 				  (lambda* (#:key inputs outputs #:allow-other-keys)
 				    (let ((out  (assoc-ref outputs "out")))					  
-				      (substitute* '("scripts/babweb.sh" "scripts/format.sh" "scripts/init-acct.sh" "scripts/masttoot.sh")
+				      (substitute* '("scripts/start-babweb.sh" "scripts/format.sh" "scripts/init-acct.sh" "scripts/masttoot.sh" "scripts/tweet.sh")
 					(("babwebstorepath")
 					 out))
-				      (substitute* '("scripts/babweb.sh" "scripts/format.sh" "scripts/init-acct.sh" "scripts/masttoot.sh")
+				      (substitute* '("scripts/start-babweb.sh" "scripts/format.sh" "scripts/init-acct.sh" "scripts/masttoot.sh" "scripts/tweet.sh")
 					(("guileloadpath")
 					 (string-append  out "/share/guile/site/3.0:"
 							 (assoc-ref inputs "guile")  "/share/guile/site/3.0:"
 							 (assoc-ref inputs "guile-json")  "/share/guile/site/3.0:"
 							 (assoc-ref inputs "guile-oauth")  "/share/guile/site/3.0:"
 							 (getenv "GUILE_LOAD_PATH") "\"")))
-				      (substitute* '("scripts/babweb.sh" "scripts/format.sh" "scripts/init-acct.sh" "scripts/masttoot.sh")
+				      (substitute* '("scripts/start-babweb.sh" "scripts/format.sh" "scripts/init-acct.sh" "scripts/masttoot.sh" "scripts/tweet.sh")
 					(("guileexecutable")
 					 (string-append (assoc-ref inputs "guile") "/bin/guile")))
 				      
-				      (substitute* '("scripts/babweb.sh" "scripts/format.sh" "scripts/init-acct.sh" "scripts/masttoot.sh")
+				      (substitute* '("scripts/start-babweb.sh" "scripts/format.sh" "scripts/init-acct.sh" "scripts/masttoot.sh" "scripts/tweet.sh")
 					(("guileloadcompiledpath")
 					 (string-append  out "/lib/guile/3.0/site-ccache:"
 							 (assoc-ref inputs "guile")  "/lib/guile/3.0/site-ccache:"
@@ -81,7 +81,7 @@
 					   (bin-dir (string-append out "/bin"))
 					   (scm  "/share/guile/site/3.0")
 					   (go   "/lib/guile/3.0/site-ccache")
-					   (all-files '("babweb.sh" "format.sh" "init-acct.sh" "masttoot.sh")))				      
+					   (all-files '("start-babweb.sh" "format.sh" "init-acct.sh" "masttoot.sh" "tweet.sh")))				      
 				      (map (lambda (file)
 					     (begin
 					       (install-file (string-append "./scripts/" file) bin-dir)
@@ -100,7 +100,10 @@
 		       )))
   (native-inputs
     `(("guile" ,guile-3.0)))
-  (propagated-inputs `( ("guile-json" ,guile-json-4) ("guile-oauth" ,guile-oauth)("bash" ,bash)("artanis" ,artanis-07)))
+  (propagated-inputs `( ("guile-json" ,guile-json-4) ("guile-oauth" ,guile-oauth)("bash" ,bash)
+  
+;;("artanis" ,artanis-07)
+))
   (synopsis "Auto tweeter for educational tweets concerning propaganda")
   (description "Auto tweeter for educational tweets concerning propaganda")
   (home-page "www.build-a-bot.biz")

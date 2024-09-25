@@ -24,3 +24,5 @@ cd /home/mbc/projects/labsolns
 git add .
 git commit -m "autocommit"
 git push
+
+cd /home/mbc/projects/autostall/babweb

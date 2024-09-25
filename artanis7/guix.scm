@@ -11,11 +11,9 @@
   #:use-module (gnu packages pkg-config)
   #:use-module (json)
   #:use-module (gnu packages curl)
-  
   #:use-module (gnu packages linux)
-   #:use-module (ice-9 readline)
-   #:use-module (gnu packages nss) ;;;;;;;;;;
-   
+  #:use-module (ice-9 readline)
+  #:use-module (gnu packages nss) 
   #:use-module (gnu packages)
   #:use-module (gnu packages base)
   #:use-module (gnu packages bash)
@@ -62,7 +60,6 @@
   #:use-module (gnu packages webkit)
   #:use-module (gnu packages xorg)
   #:use-module ((srfi srfi-1) #:select (alist-delete))
-
   )
 
 (define-public artanis-07
@@ -113,11 +110,13 @@
                (("ffi-binding \"libnss3\"")
                 (string-append
                  "ffi-binding \""
+;;                 (assoc-ref inputs "nss") "/lib/nss/libnss3.so" ;;/lib/nss in original
                  (assoc-ref inputs "nss") "/lib/nss/libnss3.so" ;;/lib/nss in original
 		 "\""))
                (("ffi-binding \"libssl3\"")
                 (string-append "ffi-binding \""
-			       (assoc-ref inputs "nss") "/lib/nss/libssl3.so"  ;; /lib/nss in original
+;;			       (assoc-ref inputs "nss") "/lib/nss/libssl3.so"  ;; /lib/nss in original
+  			       (assoc-ref inputs "nss") "/lib/nss/libssl3.so"  ;; /lib/nss in original
                  "\"")))
              #t))
 	 (add-after 'unpack 'modify_executable
