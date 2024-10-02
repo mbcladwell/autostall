@@ -12,8 +12,8 @@
   #:use-module (json)
   #:use-module (gnu packages curl)
   #:use-module (gnu packages linux)
-;;  #:use-module (ice-9 readline)
-  #:use-module (gnu packages nss) ;;;;;;;;;;
+   #:use-module (ice-9 readline)
+   #:use-module (gnu packages nss) ;;;;;;;;;;
   #:use-module (gnu packages)
   #:use-module (gnu packages base)
   #:use-module (gnu packages bash)
@@ -63,13 +63,12 @@
 
   )
 
-
 (define-public artanis-07
-  (let ((commit "c86a63b8c16d0242fec4181b3bfd305717c0bce3")
+  (let ((commit "69de573cffe92c95892bf997978ad99dc6b42493")
         (revision "4"))
   (package
     (name "artanis")
-   (version (string-append "0.7." (string-take commit 7)))
+    (version (string-append "0.7." (string-take commit 7)))
     (source (origin
 	     (method git-fetch)
              (uri (git-reference
@@ -77,37 +76,26 @@
                    (commit commit)))
              (file-name (git-file-name name version))
               (sha256
-               (base32 "0ykc8xayad8jskqc1abyhv0kgq2kkf4gmhcyciwl0g2i1432grix"))
+               (base32 "15b860kmgabbdha2mjd7dlqn6csklwwbjhhc1qv6mscqfgi334a1"))
               (modules '((guix build utils)))
 
 	      ))
     (build-system guile-build-system)
     (inputs
-     (list bash-minimal guile-3.0 nspr nss))
+     (list guile-3.0 nspr nss))
     ;; FIXME the bundled csv contains one more exported procedure
     ;; (sxml->csv-string) than guile-csv. The author is maintainer of both
     ;; projects.
     ;; TODO: Add guile-dbi and guile-dbd optional dependencies.
-    (propagated-inputs
+      (propagated-inputs
      (list guile-json-4 guile-curl guile-readline))
     (native-inputs
      (list bash-minimal                           ;for the `source' builtin
-       pkg-config
-      guile-3.0                                   ;;required for guile-build-system see docs
+           pkg-config
            util-linux))                           ;for the `script' command
+  
     (arguments
-     `(
-       ;; #:modules ((guix build guile-build-system)
-       ;; 		  (guix build gnu-build-system)
-       ;; ;;           ;;  #:select (target-guile-effective-version)
-		   
-       ;; 		   ;;            ,@%default-gnu-modules
-       ;; 		   )
-       ;; 		 #:imported-modules ((guix build guile-build-system)
-       ;; 				     (guix build gnu-build-system)
-       ;; 			    ;;                     ,@%default-gnu-imported-modules
-       ;; 			    )
-     
+     '(
        #:phases
        (modify-phases %standard-phases
          (add-after 'unpack 'patch-site-dir
@@ -116,35 +104,49 @@
                (("\\(%site-dir\\)")
                 (string-append "\""
                                (assoc-ref outputs "out")
-                               "/share/guile/site/3.0/"
-                               "\"")))))
-         (add-after 'patch-site-dir 'patch-reference-to-libnss
+                               "/share/guile/site/3.0\"")))))
+         (add-after 'unpack 'patch-reference-to-libnss
            (lambda* (#:key inputs #:allow-other-keys)
              (substitute* "artanis/security/nss.scm"
                (("ffi-binding \"libnss3\"")
                 (string-append
                  "ffi-binding \""
-                 (assoc-ref inputs "nss") "/lib/nss/libnss3.so"
-                 "\""))
+                 (assoc-ref inputs "nss") "/lib/nss/libnss3.so" ;;/lib/nss in original
+		 "\""))
                (("ffi-binding \"libssl3\"")
-                (string-append
-                 "ffi-binding \"" (assoc-ref inputs "nss") "/lib/nss/libssl3.so\"")))))
-         (add-after 'patch-reference-to-libnss 'substitute-root-dir
+                (string-append "ffi-binding \""
+			       (assoc-ref inputs "nss") "/lib/nss/libssl3.so"  ;; /lib/nss in original
+                 "\"")))
+             #t))
+	 (add-after 'unpack 'modify_executable
+	   (lambda* (#:key inputs outputs #:allow-other-keys)
+	     (let ((out  (assoc-ref outputs "out")))					  
+	       (substitute* '("./bin/art.in")
+		 (("guileexecutable")
+		  (string-append (assoc-ref inputs "guile") "/bin/guile"))) )
+				    #t))		    	 
+
+         (add-before 'install 'substitute-root-dir
            (lambda* (#:key outputs #:allow-other-keys)
-             (let ((out  (assoc-ref outputs "out")))            
-               (mkdir-p (string-append out "/bin")) )))
-         (add-after 'substitute-root-dir 'wrap-art
+             (let* ((out  (assoc-ref outputs "out"))
+		   (bin-dir (string-append out "/bin"))
+		   (dummy (mkdir-p bin-dir))
+		   )
+                  (copy-recursively "./bin" bin-dir) ;for the `art' executable
+		  #t)))	 
+         (add-after 'install 'wrap-art
            (lambda* (#:key inputs outputs #:allow-other-keys)
              (let* ((out (assoc-ref outputs "out"))
                     (bin (string-append out "/bin"))
-                    (scm (string-append out "/share/guile/site/3.0/"))
-                    (go (string-append out "/lib/guile/3.0/site-ccache")))
+                    (scm (string-append out "/share/guile/site/3.0"))
+                    (go  (string-append out "/lib/guile/3.0/site-ccache")))
                (wrap-program (string-append bin "/art.in")
                  `("GUILE_LOAD_PATH" ":" prefix
                    (,scm ,(getenv "GUILE_LOAD_PATH")))
                  `("GUILE_LOAD_COMPILED_PATH" ":" prefix
-                   (,go ,(getenv "GUILE_LOAD_COMPILED_PATH"))))))))))
-    (synopsis "Web application framework written in Guile")
+                   (,go ,(getenv "GUILE_LOAD_COMPILED_PATH"))))
+               #t))))))
+    (synopsis "Web application framework written in Guile, modified for LIMS*Nucleus")
     (description "GNU Artanis is a web application framework written in Guile
 Scheme.  A web application framework (WAF) is a software framework that is
 designed to support the development of dynamic websites, web applications, web
@@ -152,7 +154,8 @@ services and web resources.  The framework aims to alleviate the overhead
 associated with common activities performed in web development.  Artanis
 provides several tools for web development: database access, templating
 frameworks, session management, URL-remapping for RESTful, page caching, and
-more.")
+more. v0.6 contains feature enhancements required by LIMS*Nucleus. v0.6 install
+uses Guile Build System; v0.7 is used by build-a-bot")
     (home-page "https://www.gnu.org/software/artanis/")
     (license (list license:gpl3+ license:lgpl3+))))) ;dual license
 

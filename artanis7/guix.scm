@@ -31,7 +31,7 @@
   #:use-module (gnu packages mes)
   #:use-module (gnu packages networking)
   #:use-module (gnu packages noweb)
-   #:use-module (gnu packages package-management)
+  #:use-module (gnu packages package-management)
   #:use-module (gnu packages password-utils)
   #:use-module (gnu packages readline)
   #:use-module (gnu packages tls)
@@ -50,9 +50,10 @@
   #:use-module (guix utils)
   #:autoload   (srfi srfi-98) (get-environment-variables)
   #:use-module (guix build utils)
+  #:use-module (guix build gremlin)
+  #:use-module (guix elf)
   #:use-module (guix gexp)
   #:use-module (ice-9 match)
-  #:use-module (guix build-system guile)
   #:use-module (gnu packages search)
   #:use-module (gnu packages serialization)
   #:use-module (gnu packages slang)
@@ -63,7 +64,7 @@
   )
 
 (define-public artanis-07
-             (let ((commit "69de573cffe92c95892bf997978ad99dc6b42493")
+             (let ((commit "c86a63b8c16d0242fec4181b3bfd305717c0bce3")
         (revision "4"))
   (package
     (name "artanis")
@@ -75,13 +76,13 @@
                    (commit commit)))
              (file-name (git-file-name name version))
               (sha256
-               (base32 "15b860kmgabbdha2mjd7dlqn6csklwwbjhhc1qv6mscqfgi334a1"))
+               (base32 "0ykc8xayad8jskqc1abyhv0kgq2kkf4gmhcyciwl0g2i1432grix"))
               (modules '((guix build utils)))
 
 	      ))
     (build-system guile-build-system)
     (inputs
-     (list guile-3.0 nspr nss))
+     (list bash-minimal guile-3.0 nspr nss))
     ;; FIXME the bundled csv contains one more exported procedure
     ;; (sxml->csv-string) than guile-csv. The author is maintainer of both
     ;; projects.
@@ -94,7 +95,18 @@
            util-linux))                           ;for the `script' command
   
     (arguments
-     '(
+     `(#:modules ((guix build guile-build-system)
+		   (guix build gnu-build-system)
+                   ;;#:select (target-guile-effective-version)
+		   
+                   ,@%default-gnu-modules)
+		 #:imported-modules ((guix build guile-build-system)
+				     (guix build gnu-build-system)
+				    ;; (guix build gremlin)
+				    ;; (guix elf)
+                           ,@%default-gnu-imported-modules
+			   )
+      ;; #:test-target "test"
        #:phases
        (modify-phases %standard-phases
          (add-after 'unpack 'patch-site-dir
@@ -105,48 +117,36 @@
                                (assoc-ref outputs "out")
                                "/share/guile/site/3.0\"")))))
          (add-after 'unpack 'patch-reference-to-libnss
-           (lambda* (#:key inputs #:allow-other-keys)
+               (lambda* (#:key inputs #:allow-other-keys)
              (substitute* "artanis/security/nss.scm"
                (("ffi-binding \"libnss3\"")
                 (string-append
                  "ffi-binding \""
-;;                 (assoc-ref inputs "nss") "/lib/nss/libnss3.so" ;;/lib/nss in original
-                 (assoc-ref inputs "nss") "/lib/nss/libnss3.so" ;;/lib/nss in original
-		 "\""))
+                 (assoc-ref inputs "nss") "/lib/nss/libnss3.so"
+                 "\""))
                (("ffi-binding \"libssl3\"")
-                (string-append "ffi-binding \""
-;;			       (assoc-ref inputs "nss") "/lib/nss/libssl3.so"  ;; /lib/nss in original
-  			       (assoc-ref inputs "nss") "/lib/nss/libssl3.so"  ;; /lib/nss in original
-                 "\"")))
-             #t))
-	 (add-after 'unpack 'modify_executable
-	   (lambda* (#:key inputs outputs #:allow-other-keys)
-	     (let ((out  (assoc-ref outputs "out")))					  
-	       (substitute* '("./bin/art.in")
-		 (("guileexecutable")
-		  (string-append (assoc-ref inputs "guile") "/bin/guile"))) )
-				    #t))		    	 
-
+                (string-append
+                 "ffi-binding \"" (assoc-ref inputs "nss") "/lib/nss/libssl3.so\"")))))
+   
          (add-before 'install 'substitute-root-dir
            (lambda* (#:key outputs #:allow-other-keys)
              (let* ((out  (assoc-ref outputs "out"))
 		   (bin-dir (string-append out "/bin"))
 		   (dummy (mkdir-p bin-dir))
 		   )
-                  (copy-recursively "./bin" bin-dir) ;for the `art' executable
-		  #t)))	 
+                  (copy-recursively "./bin" bin-dir)))) ;for the `art' executable
+		 ;; #t)))	 
          (add-after 'install 'wrap-art
            (lambda* (#:key inputs outputs #:allow-other-keys)
              (let* ((out (assoc-ref outputs "out"))
                     (bin (string-append out "/bin"))
                     (scm (string-append out "/share/guile/site/3.0"))
                     (go  (string-append out "/lib/guile/3.0/site-ccache")))
-               (wrap-program (string-append bin "/art.in")
+               (wrap-program (string-append bin "/art")
                  `("GUILE_LOAD_PATH" ":" prefix
                    (,scm ,(getenv "GUILE_LOAD_PATH")))
                  `("GUILE_LOAD_COMPILED_PATH" ":" prefix
-                   (,go ,(getenv "GUILE_LOAD_COMPILED_PATH"))))
-               #t))))))
+                   (,go ,(getenv "GUILE_LOAD_COMPILED_PATH"))))))))))
     (synopsis "Web application framework written in Guile, modified for LIMS*Nucleus")
     (description "GNU Artanis is a web application framework written in Guile
 Scheme.  A web application framework (WAF) is a software framework that is

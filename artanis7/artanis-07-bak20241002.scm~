@@ -12,7 +12,7 @@
   #:use-module (json)
   #:use-module (gnu packages curl)
   #:use-module (gnu packages linux)
-;;   #:use-module (ice-9 readline)
+   #:use-module (ice-9 readline)
    #:use-module (gnu packages nss) ;;;;;;;;;;
   #:use-module (gnu packages)
   #:use-module (gnu packages base)
@@ -64,9 +64,9 @@
   )
 
 (define-public artanis-07
-  (let ((commit "69de573cffe92c95892bf997978ad99dc6b42493")
+             (let ((commit "69de573cffe92c95892bf997978ad99dc6b42493")
         (revision "4"))
-    (package
+  (package
     (name "artanis")
     (version (string-append "0.7." (string-take commit 7)))
     (source (origin

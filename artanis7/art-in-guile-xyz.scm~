@@ -1,4 +1,4 @@
-(define-public artanis
+ (define-public artanis
   (package
     (name "artanis")
     (version "0.6")
