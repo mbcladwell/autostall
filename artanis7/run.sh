@@ -1,6 +1,6 @@
 #! /bin/bash
 
-cd /home/mbc/projects/artanis7
+cd /home/mbc/projects/artanis
 git add .
 git commit -a -S -m "autocommit"
 git push
@@ -11,7 +11,7 @@ cd /home/mbc/projects/autostall/artanis7
 sed -i "s/[ ]*(let ((commit \"[a-z0-9]*\")/             (let ((commit \"$COMMITID\")/" ./guix.scm
 sed -i "s/[ ]*(let ((commit \"[a-z0-9]*\")/             (let ((commit \"$COMMITID\")/" ./artanis-07.scm
 
-COMMITHASH=$(guix hash -x --serializer=nar /home/mbc/projects/artanis7)
+COMMITHASH=$(guix hash -x --serializer=nar /home/mbc/projects/artanis)
 sed -i "s/[ ]*(base32 \"[a-z0-9]*\"))))/             (base32 \"$COMMITHASH\"))))/" ./guix.scm
 sed -i "s/[ ]*(base32 \"[a-z0-9]*\"))))/             (base32 \"$COMMITHASH\"))))/" ./artanis-07.scm
 
